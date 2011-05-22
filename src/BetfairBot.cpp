@@ -3,7 +3,7 @@
 // Author      : 
 // Version     :
 // Copyright   : Your copyright notice
-// Description : Hello World in C++, Ansi-style
+// Description : A Betfair Bot Attempt
 //============================================================================
 
 
@@ -19,15 +19,13 @@
 #include "BetFairProxy.h"
 #include "DatabaseProxy.h"
 
-
 using namespace std;
 using namespace boost;
 using namespace boost::assign;
 
-
 int main()
 {
-	BetFairProxy bf( "falloutphil", "******" );
+	BetFairProxy bf( "falloutphil" );
 	DatabaseProxy db( "/home/phil/dev/c++/workspace/BetfairBot/src/Database/BetFair.db" );
 
 
@@ -70,6 +68,8 @@ int main()
 	}
 	db.finalize();
 	db.commit();
+
+
 
 
 

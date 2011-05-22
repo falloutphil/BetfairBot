@@ -24,7 +24,7 @@ using namespace boost::xpressive;
 class BetFairProxy
 {
 	public:
-		BetFairProxy( const string& username, const string& password );
+		BetFairProxy( const string& username );
 		~BetFairProxy();
 		apEvents getActiveEvents();
 		apMarkets getAllMarkets( MarketRequest& marketRequest );

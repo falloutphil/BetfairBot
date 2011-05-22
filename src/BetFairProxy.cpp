@@ -16,6 +16,8 @@
 
 #include <memory>
 
+#include <glib.h>
+#include <gnome-keyring-1/gnome-keyring.h>
 
 using namespace boost;
 using namespace boost::xpressive;
@@ -25,8 +27,20 @@ using namespace boost::posix_time;
 const sregex BetFairProxy::tilde = ~after('\\') >> '~';
 const sregex BetFairProxy::colon = ~after('\\') >> ':';
 
-BetFairProxy::BetFairProxy( const string& username, const string& password )
+BetFairProxy::BetFairProxy( const string& username )
 {
+
+	gchar *password;
+	if ( gnome_keyring_find_password_sync (GNOME_KEYRING_NETWORK_PASSWORD,  /* The password type */
+								  	  	   &password,
+								  	  	   /* These are the attributes - we search on these not the Key name*/
+								  	  	   "user", username.c_str(),
+								  	  	   "server", "betfair.com",
+								  	  	   NULL) /* Always end with NULL */ != GNOME_KEYRING_RESULT_OK )
+	{
+		cerr << "ERROR: Betfair password not in Gnome keychain!";
+		exit(1);
+	}
 
 	ns1__LoginReq loginReq;
 	loginReq.username = username;
@@ -176,4 +190,22 @@ apMarkets BetFairProxy::getAllMarkets( MarketRequest& marketRequest )
 	return pMarkets;
 
 
+}
+
+
+
+
+
+// Utility function if you need to re-add password to Gnome Keychain.
+void save_my_password()
+{
+    cerr << "Trying ";
+	cerr << gnome_keyring_store_password_sync (GNOME_KEYRING_NETWORK_PASSWORD, /* The password type */
+                                      	       GNOME_KEYRING_DEFAULT,          /* Where to save it */
+                                      	       "Betfair",       /* Password description, displayed to user */
+                                      	       "*******",                 /* The password itself */
+                                      	       /* These are the attributes */
+                                      	       "user", "betfair username",
+                                      	       "server", "betfair.com",
+                                      	       NULL); /* Always end with NULL */
 }
