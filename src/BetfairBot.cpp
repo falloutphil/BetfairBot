@@ -56,7 +56,7 @@ int main()
 	mkReq.events.push_back( Event( get<int>(result->back().back()) ) );
 	mkReq.countries.push_back("GBR");
 	// From now
-	mkReq.fromDate = time(NULL);
+	time(&mkReq.fromDate);
 
 
 	apMarkets markets( bf.getAllMarkets( mkReq ) );
