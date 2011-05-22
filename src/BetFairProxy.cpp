@@ -100,33 +100,33 @@ apMarkets BetFairProxy::getAllMarkets( MarketRequest& marketRequest )
 
 	createRequest( req, internalReq, hdr );
 
-	cerr << "\nStart";
+	//cerr << "\nStart";
 	internalReq.locale = marketRequest.locale.empty() ? NULL :  &marketRequest.locale;
-	cerr << "\nStart1";
+	//cerr << "\nStart1";
 	ns3__ArrayOfInt eventIdArray;
 	BOOST_FOREACH( Event& event, marketRequest.events )
 	{
 		eventIdArray.ns3__int.push_back( event.m_id );
 	}
 	internalReq.eventTypeIds = &eventIdArray;
-	cerr << "\nStart2";
+	//cerr << "\nStart2";
 	ns3__ArrayOfCountryCode countryArray;
 	if (!marketRequest.countries.empty())
 	{
 		countryArray.ns3__Country.assign( marketRequest.countries.begin(), marketRequest.countries.end() );
 		internalReq.countries = &countryArray;
 	}
-	cerr << "\nStart3";
+	//cerr << "\nStart3";
 	if (marketRequest.fromDate != -1)
 	{
-		cerr << "\nAdding time: " << marketRequest.fromDate;
+		//cerr << "\nAdding time: " << marketRequest.fromDate;
 		internalReq.fromDate = &marketRequest.fromDate;
 	}
-	cerr << "\nStart4";
+	//cerr << "\nStart4";
 	if (marketRequest.toDate != -1)
 		internalReq.toDate = &marketRequest.toDate;
 	req.request = &internalReq;
-	cerr << "\nEnd";
+	//cerr << "\nEnd";
 	apMarkets pMarkets( new vector<Market> );
 
 	if ( exchangeProxy.getAllMarkets( &req, &resp ) == SOAP_OK )
