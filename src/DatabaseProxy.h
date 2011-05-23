@@ -46,6 +46,7 @@ class DatabaseProxy
 		sqlite3_stmt* m_stmt;
 
 		bool cleanStmt();
+		apResultVector getResult();
 
 		class ValueVisitor : public static_visitor<int>
 		{
@@ -100,9 +101,9 @@ class DatabaseProxy
 //Helper Functions
 
 template <typename RESULT>
-RESULT getSingleResult( apResultVector resultVector )
+RESULT getSingleResult( apResultVector resultVector, int col = 0, int row = 0 )
 {
-	return get<RESULT>( resultVector->back().back() );
+	return get<RESULT>( (*resultVector)[row][col] );
 }
 
 #endif /* DATABASEPROXY_H_ */

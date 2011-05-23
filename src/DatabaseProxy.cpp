@@ -49,67 +49,77 @@ bool DatabaseProxy::prepare( const string& sql )
 	return sqlite3_prepare_v2( m_db, sql.c_str(), -1, &m_stmt, NULL ) == SQLITE_OK;
 }
 
+apResultVector DatabaseProxy::getResult()
+{
+	apResultVector result( new ResultVector );
+	//cout << "\nGet Rows";
+	while ( sqlite3_step( m_stmt ) == SQLITE_ROW )
+	{
+		vector<ValueVariant> row;
+		const int columns = sqlite3_column_count( m_stmt );
+		row.reserve( columns );
+		for( int col=0; col < columns; ++col )
+		{
+			//cout << "\ncol=" << col;
+			switch ( sqlite3_column_type( m_stmt, col ) )
+			{
+				case SQLITE_INTEGER:
+					// Very gay - as sqlite doesn't differ
+					// between 32-bit and 64-bit ints
+					// we get as 64-bit, try to downcast
+					// if it fails we store the long.
+					const long bigInt = sqlite3_column_int64( m_stmt, col );
+					try
+					{
+						row.push_back( numeric_cast<int>(bigInt) );
+						//cout << "\nINT";
+					}
+				    catch(numeric::negative_overflow)
+				    {
+				    	//cout << "\nLONG";
+				    	row.push_back( bigInt );
+				    }
+				    catch(numeric::positive_overflow)
+				    {
+				    	//cout << "\nLONG";
+				    	row.push_back( bigInt );
+				    }
+					//cout << "\nAdded";
+					break;
+				case SQLITE_FLOAT:
+					//cout << "\nDOUBLE";
+					row.push_back( sqlite3_column_double( m_stmt, col ) );
+					break;
+				case SQLITE_TEXT:
+					//cout << "\nSTRING";
+					// The devil's cast - will only work if ASCII is used!
+					row.push_back(
+							string( reinterpret_cast<const char *>(sqlite3_column_text(m_stmt, col)) )
+									);
+					break;
+				default:
+					cout << "\nUnsupport SQLITE Type!";
+			}
+		}
+		//cout << "\nRow push";
+		result->push_back( row );
+	 }
+
+	return result;
+
+}
+
 apResultVector DatabaseProxy::execute( apValueVariants values )
 {
 	//cout << "\nExecute";
 	cleanStmt();
 	int index = values->size();
-	apResultVector result( new ResultVector );
+	apResultVector result;
 	while ( index > 0 &&
 			apply_visitor( ValueVisitor( index, m_stmt ), (*values)[--index] ) == SQLITE_OK );
 	if ( index == 0 )
 	{
-		//cout << "\nGet Rows";
-		while ( sqlite3_step( m_stmt ) == SQLITE_ROW )
-		{
-			vector<ValueVariant> row;
-			for( int col=0; col < sqlite3_column_count( m_stmt ); ++col )
-			{
-				//cout << "\ncol=" << col;
-				switch ( sqlite3_column_type( m_stmt, col ) )
-				{
-					case SQLITE_INTEGER:
-						// Very gay - as sqlite doesn't differ
-						// between 32-bit and 64-bit ints
-						// we get as 64-bit, try to downcast
-						// if it fails we store the long.
-						const long bigInt = sqlite3_column_int64( m_stmt, col );
-						try
-						{
-							row.push_back( numeric_cast<int>(bigInt) );
-							//cout << "\nINT";
-						}
-					    catch(numeric::negative_overflow)
-					    {
-					    	//cout << "\nLONG";
-					    	row.push_back( bigInt );
-					    }
-					    catch(numeric::positive_overflow)
-					    {
-					    	//cout << "\nLONG";
-					    	row.push_back( bigInt );
-					    }
-						//cout << "\nAdded";
-						break;
-					case SQLITE_FLOAT:
-						//cout << "\nDOUBLE";
-						row.push_back( sqlite3_column_double( m_stmt, col ) );
-						break;
-					case SQLITE_TEXT:
-						//cout << "\nSTRING";
-						// The devil's cast - will only work if ASCII is used!
-						row.push_back(
-								string( reinterpret_cast<const char *>(sqlite3_column_text(m_stmt, col)) )
-								);
-						break;
-					default:
-						cout << "\nUnsupport SQLITE Type!";
-
-				}
-			}
-			//cout << "\nRow push";
-			result->push_back( row );
-		 }
+		result = getResult();
 	}
 	else
 		cout << "\nBinding Failure at index " << index;
@@ -123,49 +133,16 @@ apResultVector DatabaseProxy::execute( const vector<ValueVariant>& values )
 	//cout << "\nExecute";
 	cleanStmt();
 	int index = values.size();
-	apResultVector result( new ResultVector );
+	apResultVector result;
 	while ( index > 0 &&
 			apply_visitor( ValueVisitor( index, m_stmt ), values[--index] ) == SQLITE_OK );
 	if ( index == 0 )
 	{
-		//cout << "\nGet Rows";
-		while ( sqlite3_step( m_stmt ) == SQLITE_ROW )
-		{
-			vector<ValueVariant> row;
-			for( int col=0; col < sqlite3_column_count( m_stmt ); ++col )
-			{
-				//cout << "\ncol=" << col;
-				switch ( sqlite3_column_type( m_stmt, col ) )
-				{
-					case SQLITE_INTEGER:
-						//cout << "\nINT";
-						row.push_back( sqlite3_column_int( m_stmt, col ) );
-						//cout << "\nAdded";
-						break;
-					case SQLITE_FLOAT:
-						//cout << "\nDOUBLE";
-						row.push_back( sqlite3_column_double( m_stmt, col ) );
-						break;
-					case SQLITE_TEXT:
-						//cout << "\nSTRING";
-						// The devil's cast - will only work if ASCII is used!
-						row.push_back(
-								string( reinterpret_cast<const char *>(sqlite3_column_text(m_stmt, col)) )
-								);
-						break;
-					default:
-						cout << "\nUnsupport SQLITE Type!";
-
-				}
-			}
-			//cout << "\nRow push";
-			result->push_back( row );
-		 }
+		result = getResult();
 	}
 	else
 		cout << "\nBinding Failure at index " << index;
 
-	//cout << "\nReturn result";
 	return result;
 }
 
@@ -175,87 +152,18 @@ apResultVector DatabaseProxy::execute( const ValueVariant& value )
 	apResultVector result( new ResultVector );
 	if ( apply_visitor( ValueVisitor( 1, m_stmt ), value ) == SQLITE_OK )
 	{
-		cerr << "\nGet Rows";
-		while ( sqlite3_step( m_stmt ) == SQLITE_ROW )
-		{
-			vector<ValueVariant> row;
-			for( int col=0; col < sqlite3_column_count( m_stmt ); ++col )
-			{
-				cerr << "\ncol=" << col;
-				switch ( sqlite3_column_type( m_stmt, col ) )
-				{
-					case SQLITE_INTEGER:
-						cerr << "\nINT";
-						row.push_back( sqlite3_column_int( m_stmt, col ) );
-						//cout << "\nAdded";
-						break;
-					case SQLITE_FLOAT:
-						//cout << "\nDOUBLE";
-						row.push_back( sqlite3_column_double( m_stmt, col ) );
-						break;
-					case SQLITE_TEXT:
-						//cout << "\nSTRING";
-						// The devil's cast - will only work if ASCII is used!
-						row.push_back(
-								string( reinterpret_cast<const char *>(sqlite3_column_text(m_stmt, col)) )
-								);
-						break;
-					default:
-						cout << "\nUnsupport SQLITE Type!";
-
-				}
-			}
-			//cout << "\nRow push";
-			result->push_back( row );
-		 }
+		result = getResult();
 	}
 	else
 		cout << "\nBinding Failure at on value: " << value;
 
-	//cout << "\nReturn result";
 	return result;
 }
 
 apResultVector DatabaseProxy::execute()
 {
 	cleanStmt();
-	apResultVector result( new ResultVector );
-	//cout << "\nGet Rows";
-	while ( sqlite3_step( m_stmt ) == SQLITE_ROW )
-	{
-		vector<ValueVariant> row;
-		for( int col=0; col < sqlite3_column_count( m_stmt ); ++col )
-		{
-			//cout << "\ncol=" << col;
-			switch ( sqlite3_column_type( m_stmt, col ) )
-			{
-				case SQLITE_INTEGER:
-					//cout << "\nINT";
-					row.push_back( sqlite3_column_int( m_stmt, col ) );
-					//cout << "\nAdded";
-					break;
-				case SQLITE_FLOAT:
-					//cout << "\nDOUBLE";
-					row.push_back( sqlite3_column_double( m_stmt, col ) );
-					break;
-				case SQLITE_TEXT:
-					//cout << "\nSTRING";
-					// The devil's cast - will only work if ASCII is used!
-					row.push_back(
-							string( reinterpret_cast<const char *>(sqlite3_column_text(m_stmt, col)) )
-							);
-					break;
-				default:
-					cout << "\nUnsupport SQLITE Type!";
-
-			}
-		}
-		//cout << "\nRow push";
-		result->push_back( row );
-	 }
-
-	//cout << "\nReturn result";
-	return result;
+	return getResult();
 }
 
 apResultVector DatabaseProxy::atomicExecute( const string& sql, const ValueVariant& value )
