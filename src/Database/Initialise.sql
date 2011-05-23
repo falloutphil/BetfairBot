@@ -26,3 +26,17 @@ CREATE TABLE Markets
 	isTurningInPlay INTEGER
 );
 
+DROP TABLE Keyring
+CREATE TABLE Keyring
+(
+	Attribute TEXT,
+	Value TEXT
+)
+
+INSERT INTO Keyring ( Attribute, Value )
+VALUES ('user', 'falloutphil')
+
+INSERT INTO Keyring ( Attribute, Value )
+VALUES ('server', 'betfair.com')
+
+

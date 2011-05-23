@@ -10,15 +10,15 @@
 
 #include <string>
 #include <memory>
-#include <boost/shared_ptr.hpp>
-#include "boost/variant.hpp"
+#include <boost/variant.hpp>
 
 
 
 using namespace std;
 using namespace boost;
 
-typedef variant< int, double, long, string, bool > ValueVariant;
+// const char* needed as "text" gets matched to bool not string!!
+typedef variant< int, double, long, string, bool, const char* > ValueVariant;
 typedef vector< vector<ValueVariant> > ResultVector;
 typedef auto_ptr< vector< vector<ValueVariant> > > apResultVector;
 typedef auto_ptr< vector<ValueVariant> > apValueVariants;

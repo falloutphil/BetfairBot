@@ -14,6 +14,8 @@
 #include <vector>
 #include <memory>
 
+#include <boost/variant.hpp>
+
 #include "TypeDefs.h"
 
 
@@ -33,9 +35,11 @@ class DatabaseProxy
 		apResultVector execute( const vector<ValueVariant>& values );
 		apResultVector execute( const ValueVariant& value );
 		apResultVector execute();
+		apResultVector atomicExecute( const string& sql, const ValueVariant& value );
 		bool finalize();
 		bool begin();
 		bool commit();
+
 
 	private:
 		sqlite3* m_db;
@@ -73,11 +77,17 @@ class DatabaseProxy
 		    		return sqlite3_bind_text( m_stmt, m_index, value.c_str(), -1, NULL );
 		    	}
 
+		    	int operator()( const char* value ) const
+		    	{
+		    		return sqlite3_bind_text( m_stmt, m_index, value, -1, NULL );
+		    	}
+
 		    	int operator()( bool value ) const
 		    	{
 		    		//cerr << "\nBool Binding: " << value << " to " << m_index;
 		    		return sqlite3_bind_int( m_stmt, m_index, value ? 1 : 0 );
 		    	}
+
 
 
 			private:
@@ -87,6 +97,12 @@ class DatabaseProxy
 
 };
 
+//Helper Functions
 
+template <typename RESULT>
+RESULT getSingleResult( apResultVector resultVector )
+{
+	return get<RESULT>( resultVector->back().back() );
+}
 
 #endif /* DATABASEPROXY_H_ */

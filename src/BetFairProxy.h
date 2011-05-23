@@ -13,6 +13,7 @@
 
 #include "Event.h"
 #include "Market.h"
+#include "DatabaseProxy.h"
 
 #include <memory>
 
@@ -24,7 +25,7 @@ using namespace boost::xpressive;
 class BetFairProxy
 {
 	public:
-		BetFairProxy( const string& username );
+		BetFairProxy( DatabaseProxy& db );
 		~BetFairProxy();
 		apEvents getActiveEvents();
 		apMarkets getAllMarkets( MarketRequest& marketRequest );
@@ -49,6 +50,11 @@ class BetFairProxy
 		{
 			sessionToken = *resp.Result->header->sessionToken;
 		}
+
+		// Authentication Accessors
+		static const string selectKeyringValueSql;
+		static const string user;
+		static const string server;
 };
 
 #endif /* BETFAIRPROXY_H_ */

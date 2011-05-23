@@ -258,6 +258,13 @@ apResultVector DatabaseProxy::execute()
 	return result;
 }
 
+apResultVector DatabaseProxy::atomicExecute( const string& sql, const ValueVariant& value )
+{
+	prepare( sql );
+	apResultVector result = execute( value );
+	finalize();
+	return result;
+}
 
 bool DatabaseProxy::finalize()
 {

@@ -25,8 +25,8 @@ using namespace boost::assign;
 
 int main()
 {
-	BetFairProxy bf( "falloutphil" );
 	DatabaseProxy db( "/home/phil/dev/c++/workspace/BetfairBot/src/Database/BetFair.db" );
+	BetFairProxy bf( db );
 
 
 	// Get Events
@@ -43,15 +43,8 @@ int main()
 
 
 	// Request Markets for specific event
-
-	db.prepare( Event::selectIdSql );
-	apResultVector result = db.execute( string("Soccer") );
-	db.finalize();
-
-	cerr << "\nRes: " << result->back().back();
-
 	MarketRequest mkReq;
-	mkReq.events.push_back( Event( get<int>(result->back().back()) ) );
+	mkReq.events.push_back( Event( getSingleResult<int>( db.atomicExecute(Event::selectIdSql, "Soccer") ) ) );
 	mkReq.countries.push_back("GBR");
 	// From now
 	time(&mkReq.fromDate);

@@ -8,6 +8,7 @@
 #include "BetFairProxy.h"
 #include "Event.h"
 #include "Market.h"
+#include "DatabaseProxy.h"
 
 #include <boost/foreach.hpp>
 #include <boost/xpressive/xpressive.hpp>
@@ -16,7 +17,6 @@
 
 #include <memory>
 
-#include <glib.h>
 #include <gnome-keyring-1/gnome-keyring.h>
 
 using namespace boost;
@@ -27,15 +27,22 @@ using namespace boost::posix_time;
 const sregex BetFairProxy::tilde = ~after('\\') >> '~';
 const sregex BetFairProxy::colon = ~after('\\') >> ':';
 
-BetFairProxy::BetFairProxy( const string& username )
-{
+// Database and Keyring authentication
+const string BetFairProxy::selectKeyringValueSql = "SELECT Value FROM Keyring WHERE Attribute = ?";
+const string BetFairProxy::user   = "user";
+const string BetFairProxy::server = "server";
 
-	gchar *password;
+BetFairProxy::BetFairProxy( DatabaseProxy& db )
+{
+	const string userValue   = getSingleResult<string>( db.atomicExecute(selectKeyringValueSql, user) );
+	const string serverValue = getSingleResult<string>( db.atomicExecute(selectKeyringValueSql, server) );
+	char* password;
+
 	if ( gnome_keyring_find_password_sync (GNOME_KEYRING_NETWORK_PASSWORD,  /* The password type */
 								  	  	   &password,
 								  	  	   /* These are the attributes - we search on these not the Key name*/
-								  	  	   "user", username.c_str(),
-								  	  	   "server", "betfair.com",
+								  	  	   user.c_str(),   userValue.c_str(),
+								  	  	   server.c_str(), serverValue.c_str(),
 								  	  	   NULL) /* Always end with NULL */ != GNOME_KEYRING_RESULT_OK )
 	{
 		cerr << "ERROR: Betfair password not in Gnome keychain!";
@@ -43,7 +50,7 @@ BetFairProxy::BetFairProxy( const string& username )
 	}
 
 	ns1__LoginReq loginReq;
-	loginReq.username = username;
+	loginReq.username = userValue;
 	loginReq.password = password;
 	loginReq.productId = 82;
 	loginReq.ipAddress = "0";
@@ -55,10 +62,7 @@ BetFairProxy::BetFairProxy( const string& username )
 	cout << "\nProxy call..";
 	if ( globalProxy.login( &login, &response ) == SOAP_OK )
 	{
-		cout << "\nBlah: ";
-		ns1__LoginResp& result = *(response.Result);
-		cout << *result.currency;
-		sessionToken = *(result.header->sessionToken);
+		storeNewToken( response );
 		cout << "\n" << sessionToken << endl;
 	}
 	else
