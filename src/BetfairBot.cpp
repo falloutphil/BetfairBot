@@ -11,6 +11,10 @@
 
 #include <iostream>
 #include <ctime>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+
 #include <boost/foreach.hpp>
 #include <boost/assign/list_of.hpp>
 
@@ -25,7 +29,11 @@ using namespace boost::assign;
 
 int main()
 {
-	DatabaseProxy db( "/home/phil/dev/c++/workspace/BetfairBot/src/Database/BetFair.db" );
+	const struct passwd* pw = getpwuid(getuid());
+	string betfairDb( pw->pw_dir );
+	betfairDb += "/.BetfairBot/BetFair.db";
+
+	DatabaseProxy db( betfairDb );
 	BetFairProxy bf( db );
 
 
