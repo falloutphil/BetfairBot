@@ -166,7 +166,7 @@ apMarkets BetFairProxy::getAllMarkets( MarketRequest& marketRequest )
 	    	{
 	    		sregex_token_iterator cur( market.begin(), market.end(), tilde, -1 );
 	    		pMarkets->push_back( Market(
-	    				lexical_cast<int>(*cur),
+	    				lexical_cast<int32_t>(*cur),
 	    				*(++cur),
 	    				*(++cur),
 	    				*(++cur),
@@ -174,11 +174,11 @@ apMarkets BetFairProxy::getAllMarkets( MarketRequest& marketRequest )
 	    				*(++cur),
 	    				*(++cur),
 	    				*(++cur),
-	    				lexical_cast<int>(*(++cur)),
+	    				lexical_cast<int32_t>(*(++cur)),
 	    				*(++cur),
 	    				from_time_t( lexical_cast<int64_t>(*(++cur)) / 1000 ),
-	    				lexical_cast<int>(*(++cur)),
-	    				lexical_cast<int>(*(++cur)),
+	    				lexical_cast<int32_t>(*(++cur)),
+	    				lexical_cast<int32_t>(*(++cur)),
 	    				lexical_cast<double>(*(++cur)),
 	    				(*(++cur)) == "Y",
 	    				(*(++cur)) == "Y" ) );

@@ -12,12 +12,14 @@
 #include <string>
 #include <vector>
 
+#include <boost/cstdint.hpp>
+
 #include "TypeDefs.h"
 
 struct Event
 {
-	Event ( int id, const string& name ) : m_id(id), m_name(name) {};
-	Event ( int id ) : m_id(id) {};
+	Event ( int32_t id, const string& name ) : m_id(id), m_name(name) {};
+	Event ( int32_t id ) : m_id(id) {};
 	Event ( const string& name ) : m_name(name) {};
 
 	static const string insertSql;
@@ -28,7 +30,7 @@ struct Event
 	apValueVariants selectId();
 	apValueVariants selectName();
 
-	int m_id;
+	int32_t m_id;
 	string m_name;
 };
 

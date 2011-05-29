@@ -57,9 +57,9 @@ apResultVector DatabaseProxy::getResult()
 	while ( sqlite3_step( m_stmt ) == SQLITE_ROW )
 	{
 		vector<ValueVariant> row;
-		const int columns = sqlite3_column_count( m_stmt );
+		const int32_t columns = sqlite3_column_count( m_stmt );
 		row.reserve( columns );
-		for( int col=0; col < columns; ++col )
+		for( int32_t col=0; col < columns; ++col )
 		{
 			//cout << "\ncol=" << col;
 			switch ( sqlite3_column_type( m_stmt, col ) )
@@ -72,7 +72,7 @@ apResultVector DatabaseProxy::getResult()
 					const int64_t bigInt = sqlite3_column_int64( m_stmt, col );
 					try
 					{
-						row.push_back( numeric_cast<int>(bigInt) );
+						row.push_back( numeric_cast<int32_t>(bigInt) );
 						//cout << "\nINT";
 					}
 				    catch(numeric::negative_overflow)
@@ -114,7 +114,7 @@ apResultVector DatabaseProxy::execute( apValueVariants values )
 {
 	//cout << "\nExecute";
 	cleanStmt();
-	int index = values->size();
+	int32_t index = values->size();
 	apResultVector result;
 	while ( index > 0 &&
 			apply_visitor( ValueVisitor( index, m_stmt ), (*values)[--index] ) == SQLITE_OK );
@@ -133,7 +133,7 @@ apResultVector DatabaseProxy::execute( const vector<ValueVariant>& values )
 {
 	//cout << "\nExecute";
 	cleanStmt();
-	int index = values.size();
+	int32_t index = values.size();
 	apResultVector result;
 	while ( index > 0 &&
 			apply_visitor( ValueVisitor( index, m_stmt ), values[--index] ) == SQLITE_OK );

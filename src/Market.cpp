@@ -10,13 +10,15 @@
 
 #include <boost/assign/std/vector.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/cstdint.hpp>
 
 using namespace boost::assign;
 using namespace boost::posix_time;
+using namespace boost;
 
 const string Market::insertSql = "INSERT INTO Markets VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
 
-Market::Market ( 	int 			id,
+Market::Market ( 	int32_t 		id,
 					const string& 	name,
 					const string& 	type,
 					const string& 	status,
@@ -24,11 +26,11 @@ Market::Market ( 	int 			id,
 					const string& 	menuPath,
 					const string&	eventHeirachy,
 					const string&	betDelay,
-					int				exchangeId,
+					int32_t			exchangeId,
 					const string&	countryCode,
 					ptime			lastRefresh,
-					int				numOfRunners,
-					int				numOfWinners,
+					int32_t			numOfRunners,
+					int32_t			numOfWinners,
 					double			totalMatched,
 					bool			isBsp,
 					bool			isTurningInPlay ) :

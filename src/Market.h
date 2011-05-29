@@ -14,18 +14,19 @@
 #include <ctime>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/cstdint.hpp>
 
 #include "TypeDefs.h"
 #include "Event.h"
 
 using namespace boost::posix_time;
-
+using namespace boost;
 
 struct Market
 {
 	public:
 
-		Market ( 	int 			id,
+		Market ( 	int32_t  		id,
 					const string& 	name,
 					const string& 	type,
 					const string& 	status,
@@ -33,11 +34,11 @@ struct Market
 					const string& 	menuPath,
 					const string&	eventHeirachy,
 					const string&	betDelay,
-					int				exchangeId,
+					int32_t			exchangeId,
 					const string&	countryCode,
 					ptime			lastRefresh,
-					int				numOfRunners,
-					int				numOfWinners,
+					int32_t			numOfRunners,
+					int32_t			numOfWinners,
 					double			totalMatched,
 					bool			isBsp,
 					bool			isTurningInPlay );
@@ -46,7 +47,7 @@ struct Market
 		static const string insertSql;
 
 	private:
-		int 	m_id;
+		int32_t m_id;
 		string 	m_name;
 		string 	m_type;
 		string 	m_status;
@@ -54,11 +55,11 @@ struct Market
 		string 	m_menuPath;
 		string	m_eventHeirachy;
 		string	m_betDelay;
-		int		m_exchangeId;
+		int32_t	m_exchangeId;
 		string	m_countryCode;
 		ptime	m_lastRefresh;
-		int		m_numOfRunners;
-		int		m_numOfWinners;
+		int32_t	m_numOfRunners;
+		int32_t	m_numOfWinners;
 		double	m_totalMatched;
 		bool	m_isBsp;
 		bool	m_isTurningInPlay;

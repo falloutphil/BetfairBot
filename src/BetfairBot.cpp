@@ -17,6 +17,7 @@
 
 #include <boost/foreach.hpp>
 #include <boost/assign/list_of.hpp>
+#include <boost/cstdint.hpp>
 
 #include "Event.h"
 #include "Market.h"
@@ -29,7 +30,7 @@ using namespace boost;
 using namespace boost::assign;
 
 
-int main()
+int32_t main()
 {
 
 
@@ -57,7 +58,7 @@ int main()
 
 	// Request Markets for specific event
 	MarketRequest mkReq;
-	mkReq.events.push_back( Event( getSingleResult<int>( db.atomicExecute(Event::selectIdSql, "Soccer") ) ) );
+	mkReq.events.push_back( Event( getSingleResult<int32_t>( db.atomicExecute(Event::selectIdSql, "Soccer") ) ) );
 	mkReq.countries.push_back("GBR");
 	// From now
 	time(&mkReq.fromDate);
