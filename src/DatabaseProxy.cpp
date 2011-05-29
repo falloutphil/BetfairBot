@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/cstdint.hpp>
 
 using namespace boost;
 
@@ -67,8 +68,8 @@ apResultVector DatabaseProxy::getResult()
 					// Very gay - as sqlite doesn't differ
 					// between 32-bit and 64-bit ints
 					// we get as 64-bit, try to downcast
-					// if it fails we store the long.
-					const long bigInt = sqlite3_column_int64( m_stmt, col );
+					// if it fails we store as 64bits.
+					const int64_t bigInt = sqlite3_column_int64( m_stmt, col );
 					try
 					{
 						row.push_back( numeric_cast<int>(bigInt) );

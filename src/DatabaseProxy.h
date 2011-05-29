@@ -15,6 +15,7 @@
 #include <memory>
 
 #include <boost/variant.hpp>
+#include <boost/cstdint.hpp>
 
 #include "TypeDefs.h"
 
@@ -66,7 +67,7 @@ class DatabaseProxy
 		    		return sqlite3_bind_double( m_stmt, m_index, value );
 		    	}
 
-		    	int operator()( long value ) const
+		    	int operator()( int64_t value ) const
 		    	{
 		    		//cerr << "\nLong Binding: " << value << " to " << m_index;
 		    		return sqlite3_bind_int64( m_stmt, m_index, value );

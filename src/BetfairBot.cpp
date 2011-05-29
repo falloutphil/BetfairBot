@@ -23,12 +23,17 @@
 #include "BetFairProxy.h"
 #include "DatabaseProxy.h"
 
+
 using namespace std;
 using namespace boost;
 using namespace boost::assign;
 
+
 int main()
 {
+
+
+
 	const struct passwd* pw = getpwuid(getuid());
 	string betfairDb( pw->pw_dir );
 	betfairDb += "/.BetfairBot/BetFair.db";
@@ -69,8 +74,6 @@ int main()
 	}
 	db.finalize();
 	db.commit();
-
-
 
 
 

@@ -14,6 +14,7 @@
 #include <boost/xpressive/xpressive.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/cstdint.hpp>
 
 #include <memory>
 
@@ -169,13 +170,13 @@ apMarkets BetFairProxy::getAllMarkets( MarketRequest& marketRequest )
 	    				*(++cur),
 	    				*(++cur),
 	    				*(++cur),
-	    				from_time_t( lexical_cast<long>(*(++cur)) / 1000 ),
+	    				from_time_t( lexical_cast<int64_t>(*(++cur)) / 1000 ),
 	    				*(++cur),
 	    				*(++cur),
 	    				*(++cur),
 	    				lexical_cast<int>(*(++cur)),
 	    				*(++cur),
-	    				from_time_t( lexical_cast<long>(*(++cur)) / 1000 ),
+	    				from_time_t( lexical_cast<int64_t>(*(++cur)) / 1000 ),
 	    				lexical_cast<int>(*(++cur)),
 	    				lexical_cast<int>(*(++cur)),
 	    				lexical_cast<double>(*(++cur)),

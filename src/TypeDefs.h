@@ -11,6 +11,7 @@
 #include <string>
 #include <memory>
 #include <boost/variant.hpp>
+#include <boost/cstdint.hpp>
 
 
 
@@ -18,7 +19,7 @@ using namespace std;
 using namespace boost;
 
 // const char* needed as "text" gets matched to bool not string!!
-typedef variant< int, double, long, string, bool, const char* > ValueVariant;
+typedef variant< int, double, int64_t, string, bool, const char* > ValueVariant;
 typedef vector< vector<ValueVariant> > ResultVector;
 typedef auto_ptr< vector< vector<ValueVariant> > > apResultVector;
 typedef auto_ptr< vector<ValueVariant> > apValueVariants;
