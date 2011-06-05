@@ -53,7 +53,7 @@ class DatabaseProxy
 		{
 			public:
 				explicit ValueVisitor( int32_t index, sqlite3_stmt* stmt )
-						 : m_index( index ), m_stmt( stmt ) {};
+						 : m_index( ++index ), m_stmt( stmt ) {};
 
 		    	int32_t operator()( int32_t value ) const
 		    	{

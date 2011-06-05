@@ -32,9 +32,6 @@ using namespace boost::assign;
 
 int32_t main()
 {
-
-
-
 	const struct passwd* pw = getpwuid(getuid());
 	string betfairDb( pw->pw_dir );
 	betfairDb += "/.BetfairBot/BetFair.db";

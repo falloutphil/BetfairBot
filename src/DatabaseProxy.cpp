@@ -116,14 +116,14 @@ apResultVector DatabaseProxy::execute( apValueVariants values )
 	cleanStmt();
 	int32_t index = values->size();
 	apResultVector result;
-	while ( index > 0 &&
-			apply_visitor( ValueVisitor( index, m_stmt ), (*values)[--index] ) == SQLITE_OK );
-	if ( index == 0 )
+	while ( index-- > 0 &&
+			apply_visitor( ValueVisitor( index, m_stmt ), (*values)[index] ) == SQLITE_OK );
+	if ( index == -1 )
 	{
 		result = getResult();
 	}
 	else
-		cout << "\nBinding Failure at index " << index;
+		cerr << "\nVec AP Binding Failure at index " << index;
 
 	//cout << "\nReturn result";
 	return result;
@@ -135,14 +135,15 @@ apResultVector DatabaseProxy::execute( const vector<ValueVariant>& values )
 	cleanStmt();
 	int32_t index = values.size();
 	apResultVector result;
-	while ( index > 0 &&
-			apply_visitor( ValueVisitor( index, m_stmt ), values[--index] ) == SQLITE_OK );
-	if ( index == 0 )
+	while ( index-- > 0 &&
+			apply_visitor( ValueVisitor( index, m_stmt ), values[index] ) == SQLITE_OK );
+
+	if ( index == -1 )
 	{
 		result = getResult();
 	}
 	else
-		cout << "\nBinding Failure at index " << index;
+		cerr << "\nVec Ref Binding Failure at index " << index;
 
 	return result;
 }
@@ -151,12 +152,12 @@ apResultVector DatabaseProxy::execute( const ValueVariant& value )
 {
 	cleanStmt();
 	apResultVector result( new ResultVector );
-	if ( apply_visitor( ValueVisitor( 1, m_stmt ), value ) == SQLITE_OK )
+	if ( apply_visitor( ValueVisitor( 0, m_stmt ), value ) == SQLITE_OK )
 	{
 		result = getResult();
 	}
 	else
-		cout << "\nBinding Failure at on value: " << value;
+		cerr << "\nRef Binding Failure at on value: " << value;
 
 	return result;
 }
